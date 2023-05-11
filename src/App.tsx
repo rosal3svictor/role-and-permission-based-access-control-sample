@@ -1,11 +1,21 @@
-import { useState } from 'react';
+import { ProtectedRoute, AuthorizedSection } from '@components';
 
 import reactLogo from './assets/react.svg';
 import './App.css';
 
-function App(): JSX.Element {
-  const [count, setCount] = useState(0);
+function AdminPage(): JSX.Element {
+  return <h1>Welcome to the Admin Page!</h1>;
+}
 
+function EmployeePage(): JSX.Element {
+  return <h1>Welcome to the Employee Page!</h1>;
+}
+
+function AccessDenied(): JSX.Element {
+  return <h1>Access Denied!</h1>;
+}
+
+function App(): JSX.Element {
   return (
     <div className="App">
       <div>
@@ -17,15 +27,30 @@ function App(): JSX.Element {
         </a>
       </div>
       <h1>Vite + React</h1>
-      <div className="card">
-        <button
-          type="button"
-          onClick={() => {
-            setCount((count) => count + 1);
-          }}
+      <div>
+        <ProtectedRoute
+          requiredRoles={['admin']}
+          accessDenied={<AccessDenied />}
         >
-          count is {count}
-        </button>
+          <AuthorizedSection requiredRoles={['admin']}>
+            {({ isAuthorized }) =>
+              isAuthorized ? <AdminPage /> : <AccessDenied />
+            }
+          </AuthorizedSection>
+        </ProtectedRoute>
+
+        <ProtectedRoute
+          requiredRoles={['employee', 'admin']}
+          accessDenied={<AccessDenied />}
+        >
+          <AuthorizedSection requiredRoles={['employee', 'admin']}>
+            {({ isAuthorized }) =>
+              isAuthorized ? <EmployeePage /> : <AccessDenied />
+            }
+          </AuthorizedSection>
+        </ProtectedRoute>
+      </div>
+      <div className="card">
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
